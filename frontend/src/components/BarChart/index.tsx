@@ -6,53 +6,53 @@ import { SaleSuccess } from 'types/sale';
 import { round } from 'utils/format';
 import { BASE_URL } from 'utils/requests';
 
-type SerieData ={
-    name:string;
+type SerieData = {
+    name: string;
     data: number[];
 }
 type ChartData = {
-     labels:{
-         categories: string[];
-     };
+    labels: {
+        categories: string[];
+    };
     series: SerieData[];
 }
 
 
 const BarChart = () => {
 
-const [chartData, setChartData] =useState<ChartData>({
-    labels: {
-    categories: []
-},
-series: [
-    {
-        name: "",
-        data: []                   
-    }
-]
-});
-
-useEffect(() =>{
-    axios.get(`${BASE_URL}/sales/success-by-seller`)
-    .then(response => {
-        const data =response.data as SaleSuccess[];
-        const myLabels =data.map(x => x.sellername);
-        const mySeries = data.map(x => round( 100.0 * x.deals / x.visited, 1));
-
-
-        setChartData( {
-            labels: {
-            categories: myLabels
+    const [chartData, setChartData] = useState<ChartData>({
+        labels: {
+            categories: []
         },
         series: [
             {
-                name: "% Success",
-                data: mySeries                  
+                name: "",
+                data: []
             }
         ]
-        });
     });
-  },[]);
+
+    useEffect(() => {
+        axios.get(`${BASE_URL}/sales/success-by-seller`)
+            .then(response => {
+                const data = response.data as SaleSuccess[];
+                const myLabels = data.map(x => x.sellername);
+                const mySeries = data.map(x => round(100.0 * x.deals / x.visited, 1));
+
+
+                setChartData({
+                    labels: {
+                        categories: myLabels
+                    },
+                    series: [
+                        {
+                            name: "% Success",
+                            data: mySeries
+                        }
+                    ]
+                });
+            });
+    }, []);
     const options = {
         plotOptions: {
             bar: {
@@ -60,15 +60,15 @@ useEffect(() =>{
             }
         },
     };
-   
+
     return (
-<Chart 
-    options={{...options, xaxis: chartData.labels}}
-    series={chartData.series}
-    type="bar"
-    height="240"
-/>
-  );
+        <Chart
+            options={{ ...options, xaxis: chartData.labels }}
+            series={chartData.series}
+            type="bar"
+            height="240"
+        />
+    );
 }
 
 export default BarChart;
